@@ -1,0 +1,6 @@
+upper,1,
+lower,2,
+middle,2,
+side_upper,2,
+side_lower,2,
+side_lower_rac,0,

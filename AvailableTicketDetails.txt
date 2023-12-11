@@ -1,0 +1,3 @@
+total_normal_berth,63,
+rac_berths,18,
+waiting_list,10,
