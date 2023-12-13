@@ -1,21 +1,5 @@
-Sangee,(90, 'middle'),
-Sangeetha P A,(['S5  90', '\n'], 'upper'),
-Sabitha,(['S5  89', '\n'], 'lower'),
-Sangeetha P A,('S5  88', 'side_upper'),
-Sabitha K,('S5  87', 'side_lower'),
-Thasika V,('S5  86', 'upper'),
-Sangee ,S5  85,side_lower
-Sangee,S5  84,side_lower
-sabitha,S5  83,side_lower
-thasika,S5  82,side_lower
-angai,S5  81,side_lower
-thrisha,S5  80,side_lower
-mobi,S5  79,side_lower
-miru,S5  78,side_lower
-shanthini,S5  77,side_lower
-haridharani,S5  76,side_lower
-subashini,S5  75,upper
-feg,S5  74,upper
-Sangeetha,S5  73,upper
-Sangeetha P A ,S5  72,side_lower_rac
-sangee,S5  71,upper
+Sangeetha,S5  1,upper,CNF,
+Sabitha,S5  2,middle,CNF,
+Thasike,S5  3,lower,CNF,
+Angai,S5  4,side_upper,CNF,
+Mobi,S5  5,side_lower,CNF,
