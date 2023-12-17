@@ -19,7 +19,7 @@ class Berth:
             self.berth_type_dict[self.berth_type_det[i][0]] = int(self.berth_type_det[i][1])
             i += 1  
         file_1.close()
-        print(self.berth_type_dict)    
+  
 
         self.seat_arr = []
         seat_file = open("AvailableSeats.txt")  
@@ -46,7 +46,6 @@ class Berth:
             if self.tickets_dict[berths] > 0:
                 if berths == "rac_berths":
                     self.tickets_dict[berths] -= 1
-                    ticket_no = self.seat_arr[0]
                     del self.seat_arr[0]
                     seat_file = open("AvailableSeats.txt", "w")  
                     for seats in self.seat_arr:
@@ -54,13 +53,19 @@ class Berth:
                         seat_file.write("\n") 
                     seat_file.close()    
                     self.reduce_ticket()
-                    return ticket_no[0], "RAC"
+                    return "R", "RAC"
 
 
                 elif berths == "waiting_list":
                     self.tickets_dict[berths] -= 1
+                    del self.seat_arr[0]
+                    seat_file = open("AvailableSeats.txt", "w")  
+                    for seats in self.seat_arr:
+                        seat_file.write(seats[0] + "," )
+                        seat_file.write("\n") 
+                    seat_file.close()    
                     self.reduce_ticket()
-                    return None, "WL"
+                    return "WL", "WL"
                 else:    
                     berth_type = self.check_berth_availability(berth_preference)  
                     self.tickets_dict[berths] -= 1 
@@ -133,18 +138,13 @@ class Berth:
             return 1
         elif self.tickets_dict["rac_berths"] != 0: 
             if status == "RAC":
+            
                 self.tickets_dict["rac_berths"] += 1
-
-                if len(self.wl_arr) >= 1:
+                self.seat_arr.insert(0, 'R') 
+                '''if len(self.wl_arr) >= 1:
                     self.rac_arr.append(self.wl_arr[0])
-                    self.tickets_dict["waiting_list"] += 1
-                '''rac_file = open("RACTicketDetails.txt", "w")
-                    i = 1
-                    for details in self.rac_arr:
-                        rac_file.write(details[0] + "," + details[1] + "," + str(i) + "," + ",")
-                        rac_file.write("\n")    
-                        i += 1
-                    rac_file.close()'''
+                    self.tickets_dict["waiting_list"] += 1'''
+                
 
                 self.reduce_ticket()
                 return 1
@@ -167,7 +167,64 @@ class Berth:
 
         else:
             if status == "WL":
-                pass
+                self.tickets_dict["waiting_list"] += 1
+                self.seat_arr.insert(0, 'WL') 
+                '''if len(self.wl_arr) >= 1:
+                    self.rac_arr.append(self.wl_arr[0])
+                    self.tickets_dict["waiting_list"] += 1
+                rac_file = open("RACTicketDetails.txt", "w")
+                    i = 1
+                    for details in self.rac_arr:
+                        rac_file.write(details[0] + "," + details[1] + "," + str(i) + "," + ",")
+                        rac_file.write("\n")    
+                        i += 1
+                    rac_file.close()'''
+
+                self.reduce_ticket()
+                return 1
+
+            elif status == "RAC":
+                first_in_wl = self.wl_arr[0]
+                first_in_wl[1], first_in_wl[2], first_in_wl[3] = ticket_no, "RAC", ""
+                del self.wl_arr[0]
+                self.seat_arr.append(["WL", "\n"])
+                
+                self.tickets_dict["waiting_list"] += 1
+
+                self.reduce_ticket()
+                return first_in_wl
+
+            elif status == "CNF":
+                first_in_rac = self.rac_arr[0]
+                first_in_rac[1], first_in_rac[2], first_in_rac[3] = ticket_no, berth_type, "CNF"
+                del self.rac_arr[0]
+        
+                
+                first_in_wl = self.wl_arr[0]
+                first_in_wl[1], first_in_wl[2], first_in_wl[3] = ticket_no, "RAC", ""
+                del self.wl_arr[0]
+                self.rac_arr.append(first_in_wl)
+
+                rac_file = open("RACTicketDetails.txt", "w")
+                i = 1
+                for details in self.rac_arr:
+                    rac_file.write(details[0] + "," + "RAC" + "," + "R-" + str(i) + "," + ",")
+                    rac_file.write("\n")
+                    i += 1
+                rac_file.close()
+
+                wl_file = open("WaitingListTicketDetails.txt", "w")
+                i = 1
+                for details in self.wl_arr:
+                    wl_file.write(details[0] + "," + "WL" + "," + "WL-" + str(i) + "," + ",") # RAC counts
+                    wl_file.write("\n")    
+                    i += 1
+                wl_file.close()
+                self.tickets_dict["waiting_list"] += 1
+                self.reduce_ticket()
+                self.seat_arr.append(["WL", "\n"])
+                return first_in_rac
+
 
         
 
