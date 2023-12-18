@@ -53,7 +53,7 @@ class TrainTicket:
         else:
             print(berth_type)
             return 
-
+        self.berth_obj.override_ticket_details()
            
         
     @classmethod
@@ -66,48 +66,39 @@ class TrainTicket:
             ticket_no         = input("Ticket No. : ")
             ticket            = coach + "-" + ticket_no
             status            = input("Ticket Status (CNF/RAC/WL) : ") 
-            for details in range(len(cls.booked_details_arr)):
-                if cls.booked_details_arr[details][1] == ticket:
-                    if cls.booked_details_arr[details][0] == name:
-                        berth_type = cls.booked_details_arr[details][2]
-                        
+            
+            if status == "CNF":
+                cls.cancellation_option(name, berth_obj, ticket, status, cls.booked_details_arr)
+            elif status == "RAC":
+                cls.cancellation_option(name, berth_obj, ticket, status, berth_obj.rac_arr)
+            elif status == "WL":
+                cls.cancellation_option(name, berth_obj, ticket, status, berth_obj.wl_arr)
+            berth_obj.override_ticket_details()
+                
 
-                        cancel = berth_obj.ticket_cancellation(berth_type, ticket, status)
-                        if cancel != None:
-                            cls.booked_details_arr.remove(cls.booked_details_arr[details])
-                            print(name, "Your ticket has been cancelled")
-                            if cancel != 1:
-                                cls.booked_details_arr.append(cancel)
+            
+    @classmethod
+    def cancellation_option(cls, name, berth_obj, ticket, status, array):
+        for details in range(len(array)):
+            if array[details][1] == ticket:
+                if array[details][0] == name:
+                    berth_type = array[details][2]
+                    
+
+                    cancel = berth_obj.ticket_cancellation(berth_type, ticket, status)
+                    if cancel != None:
+                        array.remove(array[details])
+                        print(name, "Your ticket has been cancelled")
+                        if cancel != 1:
+                            array.append(cancel)
+                        if status == "CNF":    
                             write_in_file = open("BookedTicketDetails.txt", 'w')
-                            for i in range(len(cls.booked_details_arr)):
-                                write_in_file.write(cls.booked_details_arr[i][0] + "," + cls.booked_details_arr[i][1] + "," + cls.booked_details_arr[i][2] + "," )
+                            for i in range(len(array)):
+                                write_in_file.write(array[i][0] + "," + array[i][1] + "," + array[i][2] + "," )
                                 write_in_file.write("\n")
                             write_in_file.close()  
-                            seat_file = open("AvailableSeats.txt", "w")  
-                            for seats in berth_obj.seat_arr:
-                                seat_file.write(seats[0] + "," )
-                                seat_file.write("\n") 
-            
-                            seat_file.close() 
-                            break
-                    else:
-                        print("Enter Correct Name")    
-                        continue
-            
-            for details in range(len(berth_obj.rac_arr)):
-                if berth_obj.rac_arr[details][2] == ticket:
-                    if berth_obj.rac_arr[details][0] == name:
-                        berth_type = berth_obj.rac_arr[details][2]
 
-                        cancel = berth_obj.ticket_cancellation(berth_type, ticket, status)
-                        if cancel != None:
-                            
-                            berth_obj.rac_arr.remove(berth_obj.rac_arr[details])
-
-                            print(name, "Your ticket has been cancelled")
-                            if cancel != 1:
-                                berth_obj.rac_arr.append(cancel)
-                                # berth_obj.rac_arr.append(cancel)
+                        elif status == "RAC":
                             rac_file = open("RACTicketDetails.txt", "w")
                             i = 1
                             for details in berth_obj.rac_arr:
@@ -123,34 +114,8 @@ class TrainTicket:
                                 wl_file.write("\n")    
                                 i += 1
                             wl_file.close()
-                            
-                            seat_file = open("AvailableSeats.txt", "w")  
-                            for seats in berth_obj.seat_arr:
-                                seat_file.write(seats[0] + "," )
-                                seat_file.write("\n") 
-            
-                            seat_file.close() 
-                            break      
 
-                    else:
-                        print("Enter correct Name") 
-                        continue   
-
-
-            for details in range(len(berth_obj.wl_arr)):
-                if berth_obj.wl_arr[details][2] == ticket:
-                    if berth_obj.wl_arr[details][0] == name:
-                        berth_type = berth_obj.wl_arr[details][2]
-
-                        cancel = berth_obj.ticket_cancellation(berth_type, ticket, status)
-                        if cancel != None:
-                            
-                            berth_obj.wl_arr.remove(berth_obj.wl_arr[details])
-
-                            print(name, "Your ticket has been cancelled")
-                            if cancel != 1:
-                                berth_obj.wl_arr.append(cancel)
-                                # berth_obj.wl_arr.append(cancel)
+                        elif status == "WL":
                             wl_file = open("WaitingListTicketDetails.txt", "w")
                             i = 1
                             for details in berth_obj.wl_arr:
@@ -159,17 +124,18 @@ class TrainTicket:
                                 i += 1
                             wl_file.close()
 
-                            seat_file = open("AvailableSeats.txt", "w")  
-                            for seats in berth_obj.seat_arr:
-                                seat_file.write(seats[0] + "," )
-                                seat_file.write("\n") 
-            
-                            seat_file.close() 
-                            break      
+                        seat_file = open("AvailableSeats.txt", "w")  
+                        for seats in berth_obj.seat_arr:
+                            seat_file.write(seats[0] + "," )
+                            seat_file.write("\n") 
+        
+                        seat_file.close() 
+                        break
+                else:
+                    print("Enter Correct Name")    
+                    continue
 
-                    else:
-                        print("Enter correct Name") 
-                        continue   
+ 
 
     @classmethod        
     def booked_ticket_details(cls):
@@ -212,10 +178,10 @@ class TrainTicket:
             print("REGRET")    
 
     def berth_type(self):
-        print(" 1. Upper\n", "2. Middle\n", "3. Lower\n", "4. Side Upper\n", "5. Side Lower")
-        option = int(input("Select anyone of the options : "))
-        if self.age > 60:
-            option = 3
+        option = 3        
+        if self.age < 60:
+            print(" 1. Upper\n", "2. Middle\n", "3. Lower\n", "4. Side Upper\n", "5. Side Lower")
+            option = int(input("Select anyone of the options : "))
         if option == 1:
             return "upper"
         elif option == 2:

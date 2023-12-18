@@ -52,7 +52,7 @@ class Berth:
                         seat_file.write(seats[0] + "," )
                         seat_file.write("\n") 
                     seat_file.close()    
-                    self.reduce_ticket()
+                    
                     return "R", "RAC"
 
 
@@ -64,12 +64,12 @@ class Berth:
                         seat_file.write(seats[0] + "," )
                         seat_file.write("\n") 
                     seat_file.close()    
-                    self.reduce_ticket()
+                    
                     return "WL", "WL"
                 else:    
                     berth_type = self.check_berth_availability(berth_preference)  
                     self.tickets_dict[berths] -= 1 
-                    self.reduce_ticket()
+                    
                 possibility = 1 
                 
                 seat_no = self.seat_allotment()
@@ -79,7 +79,7 @@ class Berth:
         return seat_no, berth_type
     
     
-    def reduce_ticket(self): 
+    def override_ticket_details(self): 
         write_in_file = open("BerthTypeDetails.txt", 'w')
         for i in range(len(self.berth_type_det)):
             write_in_file.write(self.berth_type_det[i][0] + "," + str(self.berth_type_dict[self.berth_type_det[i][0]]) + ",")
@@ -121,32 +121,20 @@ class Berth:
         return type        
         
     def ticket_cancellation(self, berth_type, ticket_no, status):
-        '''if len(self.wl_arr) > 1: 
-            self.wl_arr.remove(self.wl_arr[1])
-        self.berth_type_dict[berth_type] += 1'''
+
         if self.tickets_dict["total_normal_berth"] != 0 and status == "CNF":
             self.seat_arr.insert(0, [ticket_no , "\n"])
             self.berth_type_dict[berth_type] += 1
             self.tickets_dict["total_normal_berth"] += 1
-            seat_file = open("AvailableSeats.txt", "w")  
-            for seats in self.seat_arr:
-                seat_file.write(seats[0] + "," )
-                seat_file.write("\n") 
-    
-            seat_file.close() 
-            self.reduce_ticket()
+            
+            
             return 1
         elif self.tickets_dict["rac_berths"] != 0: 
             if status == "RAC":
             
                 self.tickets_dict["rac_berths"] += 1
                 self.seat_arr.insert(0, 'R') 
-                '''if len(self.wl_arr) >= 1:
-                    self.rac_arr.append(self.wl_arr[0])
-                    self.tickets_dict["waiting_list"] += 1'''
                 
-
-                self.reduce_ticket()
                 return 1
 
 
@@ -162,25 +150,16 @@ class Berth:
                     i += 1
                 rac_file.close()
                 self.tickets_dict["rac_berths"] += 1
-                self.reduce_ticket()
+                
                 return first_in_rac
 
         else:
             if status == "WL":
                 self.tickets_dict["waiting_list"] += 1
                 self.seat_arr.insert(0, 'WL') 
-                '''if len(self.wl_arr) >= 1:
-                    self.rac_arr.append(self.wl_arr[0])
-                    self.tickets_dict["waiting_list"] += 1
-                rac_file = open("RACTicketDetails.txt", "w")
-                    i = 1
-                    for details in self.rac_arr:
-                        rac_file.write(details[0] + "," + details[1] + "," + str(i) + "," + ",")
-                        rac_file.write("\n")    
-                        i += 1
-                    rac_file.close()'''
+                
 
-                self.reduce_ticket()
+                
                 return 1
 
             elif status == "RAC":
@@ -191,7 +170,7 @@ class Berth:
                 
                 self.tickets_dict["waiting_list"] += 1
 
-                self.reduce_ticket()
+                
                 return first_in_wl
 
             elif status == "CNF":
@@ -221,7 +200,7 @@ class Berth:
                     i += 1
                 wl_file.close()
                 self.tickets_dict["waiting_list"] += 1
-                self.reduce_ticket()
+                
                 self.seat_arr.append(["WL", "\n"])
                 return first_in_rac
 
@@ -229,9 +208,3 @@ class Berth:
         
 
 
-
-    def move_to_rac():
-        pass
-
-    def over_ride_details():
-        pass
